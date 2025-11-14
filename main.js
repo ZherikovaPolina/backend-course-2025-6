@@ -79,6 +79,21 @@ app.get('/inventory/:id', (req, res) => {
   res.status(200).json(item); 
 });
 
+app.put('/inventory/:id', (req, res) => {
+  const id = Number(req.params.id);        
+  const db = readDB();                     
+  const item = db.find(x => x.id === id);  
+
+  if (!item) return res.status(404).send("Not found"); 
+
+  if (req.body.name) item.name = req.body.name;
+  if (req.body.description) item.description = req.body.description;
+
+  writeDB(db); 
+
+  res.status(200).json(item);
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
