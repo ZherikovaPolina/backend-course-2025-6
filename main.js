@@ -144,6 +144,28 @@ app.get('/SearchForm.html', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'SearchForm.html'));
 });
 
+app.post('/search', express.urlencoded({ extended: true }), (req, res) => {
+  const id = Number(req.body.id);
+  const includePhoto = req.body.includePhoto === "on";
+  const db = readDB();
+  const item = db.find(x => x.id === id);
+  if (!item) return res.status(404).send("Not found");
+
+  const result = {
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    photo: item.photo
+  };
+
+  if (includePhoto && item.photo) {
+    result.photo_url = `/inventory/${id}/photo`;
+  }
+
+  res.json(result);
+});
+
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
