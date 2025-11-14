@@ -70,7 +70,8 @@ app.get('/inventory', (req, res) => {
 });
 
 app.get('/inventory/:id', (req, res) => {
-  const id = Number(req.params.id);       
+  const id = Number(req.params.id);    
+  if (isNaN(id)) return res.status(400).send("ID must be a number");
   const db = readDB();                    
   const item = db.find(x => x.id === id); 
 
@@ -80,7 +81,8 @@ app.get('/inventory/:id', (req, res) => {
 });
 
 app.put('/inventory/:id', (req, res) => {
-  const id = Number(req.params.id);        
+  const id = Number(req.params.id);      
+  if (isNaN(id)) return res.status(400).send("ID must be a number");  
   const db = readDB();                     
   const item = db.find(x => x.id === id);  
 
@@ -95,7 +97,8 @@ app.put('/inventory/:id', (req, res) => {
 });
 
 app.get('/inventory/:id/photo', (req, res) => {
-  const id = Number(req.params.id);          
+  const id = Number(req.params.id);   
+  if (isNaN(id)) return res.status(400).send("ID must be a number");       
   const file = photoFile(id);                
 
   if (!fs.existsSync(file)) return res.status(404).send("Photo not found");
@@ -105,7 +108,8 @@ app.get('/inventory/:id/photo', (req, res) => {
 });
 
 app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
-  const id = Number(req.params.id);       
+  const id = Number(req.params.id);      
+  if (isNaN(id)) return res.status(400).send("ID must be a number"); 
   const db = readDB();                    
   const item = db.find(x => x.id === id); 
 
@@ -122,6 +126,7 @@ app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
 
 app.delete('/inventory/:id', (req, res) => {
   const id = Number(req.params.id);
+  if (isNaN(id)) return res.status(400).send("ID must be a number");
   let db = readDB();
   const index = db.findIndex(x => x.id === id);
 
