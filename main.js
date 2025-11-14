@@ -170,7 +170,7 @@ app.post('/search', express.urlencoded({ extended: true }), (req, res) => {
   res.json(result);
 });
 
-app.all('/*', (req, res, next) => {
+app.use((req, res, next) => {
   const valid = ['GET', 'POST', 'PUT', 'DELETE'];
   if (!valid.includes(req.method)) return res.sendStatus(405);
   next();
