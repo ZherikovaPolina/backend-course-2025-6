@@ -64,6 +64,11 @@ app.post('/register', upload.single('photo'), (req, res) => {
   res.status(201).json(item);
 });
 
+app.get('/inventory', (req, res) => {
+  const db = readDB();
+  res.status(200).json(db);
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
