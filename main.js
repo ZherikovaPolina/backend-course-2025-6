@@ -140,6 +140,10 @@ app.get('/RegisterForm.html', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'RegisterForm.html'));
 });
 
+app.get('/SearchForm.html', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'SearchForm.html'));
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
