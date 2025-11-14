@@ -120,6 +120,22 @@ app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
   res.status(200).json(item); 
 });
 
+app.delete('/inventory/:id', (req, res) => {
+  const id = Number(req.params.id);
+  let db = readDB();
+  const index = db.findIndex(x => x.id === id);
+
+  if (index === -1) return res.status(404).send("Not found");
+
+  const file = photoFile(id);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+
+  db.splice(index, 1); 
+  writeDB(db);
+
+  res.status(200).send("Deleted");
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
