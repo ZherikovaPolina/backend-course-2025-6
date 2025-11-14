@@ -104,6 +104,22 @@ app.get('/inventory/:id/photo', (req, res) => {
   res.sendFile(file);
 });
 
+app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
+  const id = Number(req.params.id);       
+  const db = readDB();                    
+  const item = db.find(x => x.id === id); 
+
+  if (!item) return res.status(404).send("Not found");        
+  if (!req.file) return res.status(400).send("No photo uploaded"); 
+
+  fs.writeFileSync(photoFile(id), req.file.buffer);
+  item.photo = `${id}.jpg`;
+
+  writeDB(db); 
+
+  res.status(200).json(item); 
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
