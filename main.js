@@ -20,6 +20,23 @@ const DB_FILE = path.join(CACHE_DIR, 'db.json');
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify([], null, 2));
 
 const app = express();
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Inventory API',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./main.js'], 
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const server = http.createServer(app); 
 
 app.use(express.json());
@@ -44,6 +61,30 @@ function photoFile(id) {
   return path.join(CACHE_DIR, `${id}.jpg`);
 }
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new inventory item
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               inventory_name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Item created
+ */
+
 app.post('/register', upload.single('photo'), (req, res) => {
   const { inventory_name, description } = req.body;
   if (!inventory_name) return res.status(400).send("inventory_name is required");
@@ -64,10 +105,38 @@ app.post('/register', upload.single('photo'), (req, res) => {
   res.status(201).json(item);
 });
 
+/**
+ * @swagger
+ * /inventory:
+ *   get:
+ *     summary: Get all inventory items
+ *     responses:
+ *       200:
+ *         description: List of items
+ */
+
 app.get('/inventory', (req, res) => {
   const db = readDB();
   res.status(200).json(db);
 });
+
+/**
+ * @swagger
+ * /inventory/{id}:
+ *   get:
+ *     summary: Get item by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Item data
+ *       404:
+ *         description: Not found
+ */
 
 app.get('/inventory/:id', (req, res) => {
   const id = Number(req.params.id);    
@@ -79,6 +148,33 @@ app.get('/inventory/:id', (req, res) => {
 
   res.status(200).json(item); 
 });
+
+/**
+ * @swagger
+ * /inventory/{id}:
+ *   put:
+ *     summary: Update item info
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Updated item
+ */
 
 app.put('/inventory/:id', (req, res) => {
   const id = Number(req.params.id);      
@@ -96,6 +192,24 @@ app.put('/inventory/:id', (req, res) => {
   res.status(200).json(item);
 });
 
+/**
+ * @swagger
+ * /inventory/{id}/photo:
+ *   get:
+ *     summary: Get item photo
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: JPEG file
+ *       404:
+ *         description: Photo not found
+ */
+
 app.get('/inventory/:id/photo', (req, res) => {
   const id = Number(req.params.id);   
   if (isNaN(id)) return res.status(400).send("ID must be a number");       
@@ -106,6 +220,32 @@ app.get('/inventory/:id/photo', (req, res) => {
   res.setHeader('Content-Type', 'image/jpeg');
   res.sendFile(file);
 });
+
+/**
+ * @swagger
+ * /inventory/{id}/photo:
+ *   put:
+ *     summary: Upload or replace item photo
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Photo updated
+ */
 
 app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
   const id = Number(req.params.id);      
@@ -124,6 +264,22 @@ app.put('/inventory/:id/photo', upload.single('photo'), (req, res) => {
   res.status(200).json(item); 
 });
 
+/**
+ * @swagger
+ * /inventory/{id}:
+ *   delete:
+ *     summary: Delete item
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */
+
 app.delete('/inventory/:id', (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) return res.status(400).send("ID must be a number");
@@ -141,13 +297,58 @@ app.delete('/inventory/:id', (req, res) => {
   res.status(200).send("Deleted");
 });
 
+/**
+ * @swagger
+ * /RegisterForm.html:
+ *   get:
+ *     summary: Web form for device registration
+ *     responses:
+ *       200:
+ *         description: Returns an HTML form
+ */
+
 app.get('/RegisterForm.html', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'RegisterForm.html'));
 });
 
+/**
+ * @swagger
+ * /SearchForm.html:
+ *   get:
+ *     summary: Web form for device search
+ *     responses:
+ *       200:
+ *         description: Returns an HTML form
+ */
+
 app.get('/SearchForm.html', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'SearchForm.html'));
 });
+
+/**
+ * @swagger
+ * /search:
+ *   post:
+ *     summary: Search device by ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: Device ID
+ *               includePhoto:
+ *                 type: string
+ *                 description: Add a link to a photo ("on")
+ *     responses:
+ *       200:
+ *         description: Information about the item
+ *       404:
+ *         description: Item not found
+ */
 
 app.post('/search', express.urlencoded({ extended: true }), (req, res) => {
   const id = Number(req.body.id);
@@ -179,4 +380,3 @@ app.use((req, res, next) => {
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
-
