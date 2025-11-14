@@ -136,6 +136,10 @@ app.delete('/inventory/:id', (req, res) => {
   res.status(200).send("Deleted");
 });
 
+app.get('/RegisterForm.html', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'RegisterForm.html'));
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
