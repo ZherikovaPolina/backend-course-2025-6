@@ -94,6 +94,16 @@ app.put('/inventory/:id', (req, res) => {
   res.status(200).json(item);
 });
 
+app.get('/inventory/:id/photo', (req, res) => {
+  const id = Number(req.params.id);          
+  const file = photoFile(id);                
+
+  if (!fs.existsSync(file)) return res.status(404).send("Photo not found");
+
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(file);
+});
+
 server.listen(options.port, options.host, () => {
   console.log(`Server running at http://${options.host}:${options.port}/`);
 });
