@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Updated Item",
+    "description": "Updated description",
+    "photo": "1.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Test Item",
+    "description": "Some description",
+    "photo": "3.jpg"
+  },
+  {
+    "id": 4,
+    "name": "qwerty",
+    "description": "12345",
+    "photo": "4.jpg"
+  },
+  {
+    "id": 5,
+    "name": "New_name",
+    "description": "qwerty",
+    "photo": "5.jpg"
+  },
+  {
+    "id": 6,
+    "name": "inventory_name",
+    "description": "qwerty",
+    "photo": "6.jpg"
+  }
+]
